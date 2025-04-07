@@ -5,21 +5,21 @@ services:
     image: node:alpine
     working_dir: /usr/app
     volumes:
-      - .:/usr/app
+      - .:/usr/app  # Montujemy bieżący katalog do kontenera
     ports:
-      - "8081:8081"  # Poprawiony port: nasłuchujemy na 8081
+      - "8081:8081"  # Udostępniamy port backendu na hoście
     environment:
-      - PORT=8081    # Port backendu zmieniony na 8081
-    command: ["node", "index.js"]
+      - PORT=8081    # Zmienna środowiskowa dla aplikacji Node.js
+    command: ["node", "index.js"]  # Uruchomienie backendu
 
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile  # Wskazuje na nasz Dockerfile frontendowy
+      dockerfile: Dockerfile  # Budujemy obraz z lokalnego Dockerfile’a
     ports:
-      - "80:80"  # Port frontendowy (Nginx) na hoście
+      - "80:80"  # Frontend (Nginx) nasłuchuje na porcie 80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Mapowanie pliku konfiguracyjnego Nginx
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Konfiguracja Nginx z pliku lokalnego
     depends_on:
       backend:
-        condition: service_started  # Teraz czekamy tylko na uruchomienie backendu, bez healthcheck
+        condition: service_started  # Frontend startuje po backendzie (bez healthcheck)
