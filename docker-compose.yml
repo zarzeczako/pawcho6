@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  backend:
+    image: node:alpine
+    working_dir: /usr/app
+    volumes:
+      - .:/usr/app
+    ports:
+      - "8081:8081"  # Poprawiony port: nasłuchujemy na 8081
+    environment:
+      - PORT=8081    # Port backendu zmieniony na 8081
+    command: ["node", "index.js"]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Wskazuje na nasz Dockerfile frontendowy
+    ports:
+      - "80:80"  # Port frontendowy (Nginx) na hoście
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Mapowanie pliku konfiguracyjnego Nginx
+    depends_on:
+      backend:
+        condition: service_started  # Teraz czekamy tylko na uruchomienie backendu, bez healthcheck
